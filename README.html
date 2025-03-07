@@ -361,29 +361,56 @@ display: none;
 <div id="pre-requisites" class="section level2">
 <h2>Pre-requisites</h2>
 <ul>
-<li>Register on Copernicus <a href="https://dataspace.copernicus.eu/">DataSpace</a></li>
-<li>Prepare OpenEO <strong>client id</strong> and
-<strong>secret</strong>;</li>
-<li><strong>Save these</strong> to a text file on your computer;</li>
-<li>Install git client from: <a href="https://git-scm.com/downloads">Git-scm</a></li>
-<li>Register on Gitlab: <a href="https://gitlab.com/users/sign_in">Gitlab signin</a></li>
-<li>Send me your Gitlab username <a href="mailto:silverm@post.bgu.ac.il" class="email">silverm@post.bgu.ac.il</a>;</li>
-<li>Install <code>R</code> and <strong>Rstudio</strong> <a href="https://posit.co/download/rstudio-desktop/">from here</a></li>
+<li>Register on Copernicus DataSpace: (<a href="https://dataspace.copernicus.eu/" class="uri">https://dataspace.copernicus.eu/</a>)</li>
+<li>Prepare OpenEO client id) and secret);</li>
+<li>Save these) to a text file on your computer.</li>
+<li>Register on GitLab: (<a href="https://gitlab.com/users/sign_in" class="uri">https://gitlab.com/users/sign_in</a>)</li>
+<li>Send me your GitLab username ((<a href="mailto:silverm@post.bgu.ac.il" class="email">silverm@post.bgu.ac.il</a>)) to get authorized for the
+class repo;</li>
 </ul>
 </div>
 <div id="getting-started" class="section level2">
-<h2>Getting Started</h2>
+<h2>Getting started</h2>
 <ul>
-<li>Clone class <a href="https://gitlab.com/rs-course/rs-arid-regions">repo</a>;</li>
+<li>Install git client from: (<a href="https://git-scm.com/downloads" class="uri">https://git-scm.com/downloads</a>)</li>
+<li>Install <code>R</code> and RStudio: (<a href="https://posit.co/download/rstudio-desktop/" class="uri">https://posit.co/download/rstudio-desktop/</a>)</li>
+<li>Clone class repo (<a href="https://gitlab.com/rs-course/rs-arid-regions" class="uri">https://gitlab.com/rs-course/rs-arid-regions</a>) to your
+computer;</li>
+<li>Start R project (using RStudio) <code>rs-arid-regions</code>;</li>
 <li>Enter your name and email into <code>participants.md</code>
 document;</li>
-<li>Commit locally</li>
-<li>After I authorize your Gitlab user, push your change to the class
-repo;</li>
-<li>Prepare polygon GIS file of your Area of Interest, save in GIS
-directory;</li>
-<li>Commit and push to class repo.</li>
+<li>Commit locally;</li>
+<li>After I authorize your GitLab user for the class repo, push your
+change.</li>
 </ul>
+</div>
+<div id="class-project" class="section level2">
+<h2>Class Project</h2>
+<div id="coding-groups" class="section level4">
+<h4>Coding groups:</h4>
+<ul>
+<li><strong>Setup</strong>: R packages, directories, parameters,
+looping;</li>
+<li><strong>Water surfaces</strong>: Prepare time series of water
+surface rasters (hint: NDWI);</li>
+<li><strong>Soil moisture</strong>: Prepare time series of soil moisture
+rasters (hint: OPTRAM)</li>
+<li><strong>Plot maps</strong>.</li>
+</ul>
+</div>
+<div id="each-student" class="section level4">
+<h4>Each student:</h4>
+<ul>
+<li>Prepare polygon GIS file of your Area of Interest</li>
+<li>Save into GIS sub-directory, and push to class repo;</li>
+<li>Commit and push to class repo.</li>
+<li>Prepare individual <code>parameters.csv</code> file: with name of
+AOI file, and dates;</li>
+<li>(Only local, <em>Not</em> shared on git repo)</li>
+<li>When all functions are written and tested, run the code on your
+AOI.</li>
+</ul>
+</div>
 </div>
 </div>
 
