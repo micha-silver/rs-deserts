@@ -2,3 +2,4 @@ param_name,param_value
 "aoi_file","Fuenteduque_aoi.gpkg"
 "from_date","2022-01-01"
 "to_date","2024-12-31"
+"output_dir","~/work/tmp"
