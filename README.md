@@ -1,11 +1,10 @@
 ---
-title: "README"
-author: "Micha"
+title: "Remote Sensing of Deserts and Desertification
+"
+author: "Arnon Karnieli and Micha Silver"
 date: "12 March, 2025"
 output: html_document
 ---
-
-# Remote Sensing in Arid Regions
 
 
 ## Pre-requisites
