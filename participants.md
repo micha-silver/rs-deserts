@@ -14,4 +14,3 @@ output: pdf_document
 |:-----------------------|:--------------------------------|:-----------------
 |Arnon Karnieli          |karnieli@bgu.ac.il               |instructor
 |Micha Silver            |silverm@post.bgu.ac.il           |assistant
-|Isreal Almoni          |ialmoni@post.bgu.ac.il             |
