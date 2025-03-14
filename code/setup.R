@@ -9,7 +9,7 @@
 # Install/Load packages------------------------------------
 remotes::install_github("ropensci/rOPTRAM")
 pkg_list <- c("terra", "rOPTRAM", "CDSE")
-invisible(lapply(pkg_list, library))
+invisible(lapply(pkg_list, library, character.only = TRUE))
 
 # Read individual user parameters
 params <- read.csv("parameters.csv")
