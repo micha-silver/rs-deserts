@@ -8,10 +8,10 @@
 
 # Install/Load packages------------------------------------
 remotes::install_github("ropensci/rOPTRAM")
-pkg_list <- c("terra", "rOPTRAM", "CDSE")
+pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml")
 invisible(lapply(pkg_list, library, character.only = TRUE))
 
 # Read individual user parameters
-params <- read.csv("parameters.csv")
+params <- read_yaml("parameters.yml")
 
 # Setup directories----------------------------------------

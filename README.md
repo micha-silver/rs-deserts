@@ -42,7 +42,11 @@ output: html_document
 * Prepare polygon GIS file of your Area of Interest
 * Save into GIS sub-directory, and push to class repo;
 * Commit and push to class repo.
-* Prepare individual `parameters.csv` file: with name of AOI file, and dates;
-* (Only local, *Not* shared on git repo)
+* Prepare individual `parameters.yml` file with:
+  - name of AOI file;
+  - analysis period (dates as "YYYY-MM-DD");
+  - OAuth clientid and secret;
+  - Output directory
+  - (This file is only local, *Not* shared on git repo)
 * When all functions are written and tested, run the code on your AOI.
 
