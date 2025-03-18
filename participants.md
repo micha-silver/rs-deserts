@@ -14,4 +14,4 @@ output: pdf_document
 |:-----------------------|:--------------------------------|:-----------------
 |Arnon Karnieli          |karnieli@bgu.ac.il               |instructor
 |Micha Silver            |silverm@post.bgu.ac.il           |assistant
-|List Penny             |list.penny484.passmail.net      |
+|
