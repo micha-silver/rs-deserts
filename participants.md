@@ -15,3 +15,4 @@ output: pdf_document
 |Arnon Karnieli          |karnieli@bgu.ac.il               |instructor
 |Micha Silver            |silverm@post.bgu.ac.il           |assistant
 |Gill Tsemach            |tsemachg@post.bgu.ac.il          |3 - Soil moisture
+|Hagar Boneh             |bonehh@post.bgu.ac.il            |3- Soil Moisture
