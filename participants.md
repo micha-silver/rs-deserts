@@ -16,4 +16,5 @@ output: pdf_document
 |Micha Silver            |silverm@post.bgu.ac.il           |assistant
 |Gill Tsemach            |tsemachg@post.bgu.ac.il          |3 - Soil moisture
 |Hagar Boneh             |bonehh@post.bgu.ac.il            |3 - Soil Moisture
+|Noa Cohen               |noaao@post.bgu.ac.il             |3 - Soil Moisture
 |Nir Vaisburd            |nirvais@post.bgu.ac.il           |4 - Map Plots
