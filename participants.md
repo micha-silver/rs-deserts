@@ -19,3 +19,4 @@ output: pdf_document
 |Noa Cohen               |noaao@post.bgu.ac.il             |3 - Soil Moisture
 |Nir Vaisburd            |nirvais@post.bgu.ac.il           |4 - Map Plots
 |Eran Tsur               |tsurer@post.bgu.ac.il            |2 - Water Surface
+|Bar Rudman              |barrud@post.bgu.ac.il            |2 - Water Surface
