@@ -3,4 +3,8 @@
 .RData
 .Ruserdata
 parameters.yml
+<<<<<<< HEAD
 Output/
+=======
+Output
+>>>>>>> 33f273db671add95d6238d0bfa36495fe3b04886
