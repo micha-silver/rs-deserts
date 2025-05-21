@@ -57,7 +57,6 @@ Prepare_OPTRAM_Model <- function() {
   t0 <- Sys.time() # measure run time
   message(t0, "OPTRAM Initialize")
   
-  getwd()
   work_dir = getwd()
   
 
@@ -65,8 +64,8 @@ Prepare_OPTRAM_Model <- function() {
   params <- read_yaml(file.path(work_dir, "parameters.yml"))
   aoi <- sf::read_sf(file.path(work_dir, params$aoi_file))
 
-  from = params$from_date
-  to = params$to_date
+  from <- params$from_date
+  to <- params$to_date
   Output_dir <- params$Output_dir
 
 
