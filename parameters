@@ -1,0 +1,6 @@
+aoi_file = Tennessee.gpkg
+from_date = 2024-01-01
+to_date = 2024-02-28
+clientid = sh-5f4f0486-3a92-4aac-ae87-294619000f07
+secret = hiTglhCsbKR4qMl2KpaUT2D6WnGchXo3
+output_dir = C:/Users/Owner/OneDrive/Desktop/arnon
