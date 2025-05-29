@@ -2,19 +2,15 @@
 
 ## תוריד את החבילות האלה אם אין לך אותם 
 pkg_list <- c("terra", "sf", "CDSE", "here")
+
 invisible(lapply(pkg_list, library, character.only = TRUE))
 
-# 🔹 Full path to your config file
-work_dir <- "C:/Users/Owner/OneDrive/Documents/rs-deserts" ## תשנה את הקוד פה לתיקייה של הקורס
-parameters = file.path(work_dir,'parameters') # קובץ חדש שבתוכו חלק מההנחיות
 
 # 🔹 Read the config as key-value pairs
-params <- read.table(parameters, sep = "=", stringsAsFactors = FALSE, strip.white = TRUE)
-params <- setNames(params$V2, params$V1)
-params <- as.list(params)
+work_dir <- here::here('parameters.yaml')
+params <- yaml::read_yaml(work_dir)
 
-# 🔹 Read AOI (GPKG) file from same folder or give full path
-aoi_path <- file.path("C:/Users/Owner/OneDrive/Documents/rs-deserts", params$aoi_file)
+aoi_path <- here::here(params$aoi_file)
 aoi <- sf::read_sf(aoi_path)
 aoi <- st_zm(aoi, drop = TRUE)
 aoi <- st_transform(aoi, 4326)
@@ -47,6 +43,34 @@ image_list <- image_list[image_list$tileCloudCover < max_cloud,]
 # How many images are left
 message("Number of images after filtering for clouds: ", nrow(image_list))
 
+# Loop over each filtered image date
+raster_list <- lapply(1:nrow(image_list), function(i) {
+  date <- as.character(image_list$acquisitionDate[i])
+  message("Downloading image for: ", date)
+  
+  # Get the image
+  result_rast <- CDSE::GetImage(
+    aoi = aoi,
+    time_range = date,
+    script = "MNDWI_masked.js",
+    collection = collection,
+    format = "image/tiff",
+    mask = TRUE,
+    resolution = 10,
+    token = tok
+  )
+  
+  # Define output filename
+  raster_file <- file.path(Output_dir, paste0("time_range_", date, ".tiff"))
+  
+  # Save it
+  terra::writeRaster(result_rast, raster_file, overwrite = TRUE)
+  message("Saved: ", raster_file)
+  
+})
+
+# Done!
+message("✅ Downloaded ", length(raster_list), " images.")
 
 
 time_range = '2024-02-14'
@@ -61,7 +85,7 @@ result_rast <- CDSE::GetImage(aoi = aoi,
                               resolution = 10,
                               token = tok)  
 # Your access token for dataspace.copernicus.eu
-raster_file <- file.path(Output_dir, "time_range.tiff")
+raster_file <- file.path(Output_dir, paste0("time_range_", time_range, ".tiff"))
 terra::writeRaster(result_rast, raster_file, overwrite = TRUE)
 # raster_file is name of new raster in your output directory
 
