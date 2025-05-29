@@ -1,6 +1,8 @@
+## here are files or patterns of files that git will not push to our common repository
+
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-parameters.yml
+parameters.* # for both .yml, .yaml or something else by mistake
 Output
