@@ -109,11 +109,19 @@ Prepare_OPTRAM_Model <- function() {
     message(Sys.time(), " - Creating soil moisture rasters...\n")
     
     
+    ## get dates with available data
+    l <- list.files(file.path(tmp,"STR"), pattern = "STG") # list of UNIQUE soil moisture file names
+    dates <- substr(l, 5, 14) # get the date string part
+    
     ## calculate the soil moisture with acquired data
-    optram_calculate_soil_moisture("2025-03-26", VI_dir = file.path(tmp,"NDVI"), 
-                                   STR_dir = file.path(tmp,"STR"), 
-                                   data_dir = data_dir, 
-                                   output_dir = file.path(Output_dir, "OPTRAM"))
+    Create_rasters <- function(d) {
+      optram_calculate_soil_moisture(d, VI_dir = file.path(tmp,"NDVI"), 
+                                     STR_dir = file.path(tmp,"STR"), 
+                                     data_dir = data_dir, 
+                                     output_dir = optram_dir)
+    }
+    lapply(dates, Create_rasters) # create for each unique date
+    
 
     ## finish
     t1 <- Sys.time() 
