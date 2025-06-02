@@ -110,8 +110,9 @@ Prepare_OPTRAM_Model <- function() {
     
     
     ## get dates with available data
-    l <- list.files(file.path(tmp,"STR"), pattern = "STG") # list of UNIQUE soil moisture file names
-    dates <- substr(l, 5, 14) # get the date string part
+    l <- list.files(file.path(tmp,"STR"), pattern = "STR") # list of tiles file names
+    dates <- substr(l, 5, 14) # get the date part from the string
+    dates <- unique(dates) ## remove duplicate dates
     
     ## calculate the soil moisture with acquired data
     Create_rasters <- function(d) {
