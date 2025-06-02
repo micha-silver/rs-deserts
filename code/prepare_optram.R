@@ -54,27 +54,29 @@ library(rOPTRAM)
 Prepare_OPTRAM_Model <- function() {
 
   t0 <- Sys.time() # measure run time
-  message(t0, "OPTRAM Initialize")
+  message(t0, " - OPTRAM Initialize")
   
   work_dir = getwd()
-  
 
   ## read parameters
-  params <- read_yaml(file.path(work_dir, "parameters.yml"))
+  params <- read_yaml(file.path(work_dir, "parameters.yaml"))
   aoi <- sf::read_sf(file.path(work_dir, params$aoi_file))
 
   from <- params$from_date
   to <- params$to_date
   Output_dir <- params$Output_dir
   
-  ## use tryCatch as temporal solution for using "save_creds = TRUE"
+  ## for storing files temporarily to not bloat the storage
+  dir.create(file.path(tempdir(), "OPTRAM")) # separate from rest temp files
+  tmp <- file.path(tempdir(), "OPTRAM") 
+  
+  ## use tryCatch as temporary solution for using "save_creds = TRUE"
   #  for saving client ID and secret
   tryCatch({
     acquire_scihub(save_creds = TRUE, clientid = params$clientid, secret = params$secret)
   }, error = function(e) {
     message(e,"\n")
   }, finally = {
-    message("downloading...")
     
     ## insert MNDWI mask?
     # aoi_masked <- <mask out water surfaces>
@@ -87,18 +89,39 @@ Prepare_OPTRAM_Model <- function() {
     ## for masking each raster, less suitable?
     # mask(<ras>, <mask>, maskvalues=TRUE) ## terra library
   
+    ## create dir for the soil moisture product
+    if (!dir.exists(file.path(Output_dir, "OPTRAM"))) {
+      dir.create(file.path(Output_dir, "OPTRAM"))
+      message('Creating "OPTRAM" directory in output directory...')
+      }
+    if (!dir.exists(file.path(Output_dir, "OPTRAM/data"))) {dir.create(file.path(Output_dir, "OPTRAM/data"))} # for data
+    
+    ## save as variables
+    optram_dir <- file.path(Output_dir, "OPTRAM")
+    data_dir <- file.path(Output_dir, "OPTRAM/data")
   
+    message("Downloading...\n")
+    
     ## scm_mask and run optram
     optram_options("scm_mask", TRUE, show_opts = FALSE) ## just to make sure
-    optram(aoi, from, to, Output_dir, Output_dir) ## run optram wrapper function
+    optram(aoi, from, to, tmp, data_dir) ## run optram wrapper function
     
+    message(Sys.time(), " - Creating soil moisture rasters...\n")
+    
+    
+    ## calculate the soil moisture with acquired data
+    optram_calculate_soil_moisture("2025-03-26", VI_dir = file.path(tmp,"NDVI"), 
+                                   STR_dir = file.path(tmp,"STR"), 
+                                   data_dir = data_dir, 
+                                   output_dir = file.path(Output_dir, "OPTRAM"))
+
     ## finish
     t1 <- Sys.time() 
-    message(t1, "OPTRAM complete") 
-    message("Runtime: ", round(difftime(t1,t0, units = "mins"), 2), " mins") ## print runtime duration in seconds
+    message("\n", t1, " - OPTRAM complete") 
+    message("Runtime: ", round(difftime(t1,t0, units = "mins"), 2), " mins\n") ## print runtime duration in seconds
   })
   
 }
 
+## run function
 Prepare_OPTRAM_Model()
-
