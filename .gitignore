@@ -4,5 +4,7 @@
 .Rhistory
 .RData
 .Ruserdata
-parameters.* # for both .yml, .yaml or something else by mistake
 Output
+
+# for both .yml, .yaml or something else by mistake
+parameters* 
