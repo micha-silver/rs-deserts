@@ -6,15 +6,14 @@
 # Written By: Nir, Ziv
 
 # List of required packages
-pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml", "here", "sf", "here", "stars", "ggplot2", "ggspatial", "viridis")
-
-# Load packages
-invisible(lapply(pkg_list, library, character.only = TRUE))
-
+pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml", "here", "sf", "sfc", "here", "stars", "ggplot2", "ggspatial", "viridis")
 # Install 'rOPTRAM' from GitHub if not already installed
 if (!requireNamespace("rOPTRAM", quietly = TRUE)) {
   remotes::install_github("ropensci/rOPTRAM")
 }
+# Load packages
+invisible(lapply(pkg_list, library, character.only = TRUE))
+
 
 # Setup directories
 work_dir <- getwd()
@@ -28,6 +27,7 @@ params <- read_yaml("parameters.yaml")
 if (!dir.exists(output_dir)) {
   dir.create(output_dir, recursive = TRUE)
 }
+
 
 # Optional: print confirmation
 message("Setup complete. Working directory: ", work_dir)
