@@ -7,10 +7,7 @@
 
 Plot_raster <- function(raster_file, title = "Raster Map", legend_title = "Value") {
   # Load required packages
-  library(stars)
-  library(ggplot2)
-  library(ggspatial)
-  library(viridis)  # for color scale
+
   
   # Start timing
   t0 <- Sys.time()
@@ -38,3 +35,9 @@ Plot_raster <- function(raster_file, title = "Raster Map", legend_title = "Value
 
 ## How to use: 
 # Plot_raster("-raster path here-", title = "-insert title here-", legend_title = "-insert relevant legend name here-")
+raster_files <- list.files("Output/OPTRAM", pattern = "\\.tif$", full.names = TRUE)
+
+# Loop through and plot
+for (f in raster_files) {
+  Plot_raster(f, title = basename(f), legend_title = "Soil Moisture")
+}
