@@ -8,9 +8,11 @@
 # Requires: parameters.yml file with user-defined paths
 # Written By: Nir, Ziv
 
-# List of required packages
+# List of required packages, check and install missing
 pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml", "here", "sf", "sfc", "stars", "ggplot2", "ggspatial", "viridis")
-# install.packages(pkg_list)
+new.packages <- pkg_list[!(pkg_list %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
 ## Install 'rOPTRAM' from GitHub if not already installed
 if (!requireNamespace("rOPTRAM", quietly = TRUE)) {
   remotes::install_github("ropensci/rOPTRAM")
