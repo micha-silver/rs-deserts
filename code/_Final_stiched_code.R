@@ -258,7 +258,7 @@ Prepare_OPTRAM_Model <- function() {
       optram_calculate_soil_moisture(d, VI_dir = file.path(tmp,"NDVI"), 
                                      STR_dir = file.path(tmp,"STR"), 
                                      data_dir = data_dir, 
-                                     Output_dir = optram_dir)
+                                     output_dir = optram_dir)
     }
     lapply(dates, Create_rasters) # create for each unique date
     
