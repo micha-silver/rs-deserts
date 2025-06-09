@@ -24,11 +24,11 @@ invisible(lapply(pkg_list, library, character.only = TRUE))
 # Setup directories
 work_dir <- getwd()
 Output_dir <- file.path(work_dir, "Output")
-cloud_cover = 15
 
 # Read individual user parameters (assumes YAML format)
 params <- read_yaml("parameters.yaml")
 
+cloud_cover = params$cloud_cover
 
 aoi_path <- here::here(params$aoi_file)
 aoi <- sf::read_sf(aoi_path)
