@@ -9,7 +9,7 @@
 # Written By: Nir, Ziv
 
 # List of required packages, check and install missing
-pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml", "here", "sf", "sfc", "stars", "ggplot2", "ggspatial", "viridis")
+pkg_list <- c("terra", "rOPTRAM", "CDSE", "yaml", "here", "sf", "sfc", "stars", 'patchwork', 'stringr', "ggplot2", "ggspatial", "viridis")
 new.packages <- pkg_list[!(pkg_list %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
@@ -96,7 +96,7 @@ raster_list <- lapply(1:nrow(image_list), function(i) {
   result_rast <- CDSE::GetImage(
     aoi = aoi,
     time_range = date,
-    script = "MNDWI_masked_EGB.js",
+    script = "code/MNDWI_masked_EGB.js",
     collection = collection,
     format = "image/tiff",
     mask = TRUE,
@@ -117,32 +117,6 @@ raster_list <- lapply(1:nrow(image_list), function(i) {
 message("Downloaded ", length(raster_list), " images.")
 
 
-# time_range = '2024-02-14'
-# ## אם הכל רץ לך טוב אז זה השלב הבא, עוד לא סיימתי איתו 
-# result_rast <- CDSE::GetImage(aoi = aoi,  
-#                               # your AOI, as sf object
-#                               time_range = time_range,
-#                               script = "MNDWI_masked.js",
-#                               collection = "sentinel-2-l2a",
-#                               format = "image/tiff",
-#                               mask = TRUE,
-#                               resolution = 10,
-#                               token = tok)  
-# # Your access token for dataspace.copernicus.eu
-# raster_file <- file.path(Output_dir, paste0("time_range_", time_range, ".tiff"))
-# terra::writeRaster(result_rast, raster_file, overwrite = TRUE)
-# # raster_file is name of new raster in your output directory
-# 
-# r <- terra::rast(raster_file)
-# plot(r, main = "time_range.tiff")
-# 
-# #### not relevant-------------###
-# val_script <- file.path(work_dir, "RGB.js")
-# 
-# # Make sure output directory exists (do this ONCE, not in the loop)
-# if (!dir.exists(Output_dir/folder)) {
-#   dir.create(Output_dir/folder, recursive = TRUE)
-# }
 
 # Download each image and save it as a raster
 raster_list <- lapply(1:nrow(image_list), function(x) {
@@ -156,7 +130,7 @@ raster_list <- lapply(1:nrow(image_list), function(x) {
       aoi = aoi,
       time_range = img_date,
       collection = collection,
-      script = "MNDWI_masked_EGB.js",
+      script = "code/RGB.js",
       resolution = 10,
       format = "image/tiff",
       token = tok
@@ -183,11 +157,12 @@ message("Done! Downloaded ", length(raster_list), " image(s).")
 # Written By: Hagar Boneh, Noa Cohen and Gill Tsemach
 
 ## loading packages
-# library(sf)
-# library(sfc)
-# library(CDSE)
-# library(yaml)
-# library(rOPTRAM)
+library(sf)
+library(sfc)
+library(CDSE)
+library(yaml)
+library(rOPTRAM)
+
 
 Prepare_OPTRAM_Model <- function() {
   
@@ -275,8 +250,6 @@ Prepare_OPTRAM_Model <- function() {
 ## run function
 Prepare_OPTRAM_Model()
 
-
-
 # Prepare map plot --------------------------------------------------
 # Description: Plot a raster layer using stars and ggplot2, with cartographic elements
 # Input: raster_file (character) – path to a raster file (e.g., GeoTIFF)
@@ -284,41 +257,72 @@ Prepare_OPTRAM_Model()
 # Requires: stars, ggplot2, ggspatial, viridis
 # Written By: Nir, Shay, May
 
-Plot_raster <- function(raster_file, title = "Raster Map", legend_title = "Value") {
-  # Load required packages
+# Plot RGB + MNDWI + soil moisture vertically --------------------------
+Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
+  rgb_rast <- read_stars(rgb_file)
+  mndwi_rast <- read_stars(mndwi_file)
+  sm_rast <- read_stars(sm_file)
   
+  # Extract date from filename safely
+  date_string <- stringr::str_extract(basename(mndwi_file), "\\d{4}-\\d{2}-\\d{2}")
   
-  # Start timing
-  t0 <- Sys.time()
-  
-  # Read the raster file
-  rast <- read_stars(raster_file)
-  
-  # Generate plot
-  p <- ggplot() +
-    geom_stars(data = rast) +
-    scale_fill_viridis_c(name = legend_title) +
-    labs(title = title) +
+  rgb_plot <- ggplot() +
+    geom_stars(data = rgb_rast) +
+    labs(title = paste("RGB -", date_string)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
-    annotation_north_arrow(location = "tr", which_north = "true", 
+    annotation_north_arrow(location = "tr", which_north = "true",
                            style = north_arrow_fancy_orienteering) +
     theme_minimal()
   
-  # Print the plot
-  print(p)
+  mndwi_plot <- ggplot() +
+    geom_stars(data = mndwi_rast) +
+    scale_fill_gradient2(
+      name = "MNDWI",
+      low = "saddlebrown", mid = "beige", high = "blue",
+      midpoint = 0, limits = c(-1, 1), oob = scales::squish
+    ) +
+    labs(title = paste("MNDWI -", date_string)) +
+    annotation_scale(location = "bl", width_hint = 0.5) +
+    annotation_north_arrow(location = "tr", which_north = "true",
+                           style = north_arrow_fancy_orienteering) +
+    theme_minimal()
   
-  # Log message
-  message(t0, " | Plot of ", raster_file, " complete.")
+  sm_plot <- ggplot() +
+    geom_stars(data = sm_rast) +
+    scale_fill_gradientn(
+      name = "Soil Moisture",
+      colours = c("#00FF00", "#66CC99", "#3399CC", "#0033CC", "#000066"),
+      limits = c(0, 1), oob = scales::squish, breaks = c(0, 1), labels = c("0", "1")
+    ) +
+    labs(title = paste("Soil Moisture -", date_string)) +
+    annotation_scale(location = "bl", width_hint = 0.5) +
+    annotation_north_arrow(location = "tr", which_north = "true",
+                           style = north_arrow_fancy_orienteering) +
+    theme_minimal()
+  
+  combo <- rgb_plot / mndwi_plot / sm_plot
+  
+  print(combo)
+  
+  out_file <- file.path(Output_dir, paste0("summary_plot_", date_string, ".png"))
+  ggsave(out_file, plot = combo, width = 8, height = 18)
+  message("Combined plot saved to: ", out_file)
 }
 
+# Match files and generate combined plots ----------------------------
+rgb_files <- list.files(Output_dir, pattern = "^RGB_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
+mndwi_files <- list.files(Output_dir, pattern = "^time_range_\\d{4}-\\d{2}-\\d{2}\\.tiff$", full.names = TRUE)
+soil_files <- list.files(file.path(Output_dir, "OPTRAM"), pattern = "^soil_moisture_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
 
-## How to use: 
-# Plot_raster("-raster path here-", title = "-insert title here-", legend_title = "-insert relevant legend name here-")
-raster_files <- list.files("Output/OPTRAM", pattern = "\\.tif$", full.names = TRUE)
-
-# Loop through and plot
-for (f in raster_files) {
-  Plot_raster(f, title = basename(f), legend_title = "Soil Moisture")
+# Loop through and match by date
+for (mndwi in mndwi_files) {
+  date_part <- stringr::str_extract(basename(mndwi), "\\d{4}-\\d{2}-\\d{2}")
+  rgb_match <- grep(paste0("RGB_", date_part), rgb_files, value = TRUE)
+  sm_match <- grep(paste0("soil_moisture_", date_part), soil_files, value = TRUE)
+  
+  if (length(rgb_match) > 0 && length(sm_match) > 0) {
+    Plot_combined(rgb_match[1], mndwi, sm_match[1])
+  } else {
+    message("Skipping date ", date_part, " — missing RGB or soil moisture file.")
+  }
 }
-
-
