@@ -74,34 +74,6 @@ raster_list <- lapply(1:nrow(image_list), function(i) {
 
 message("Downloaded ", length(raster_list), " images.")
 
-
-#RGB
-raster_list <- lapply(1:nrow(image_list), function(x) {
-  img_date <- as.character(image_list$acquisitionDate[x])
-  raster_file <- file.path(Output_dir, paste0("RGB_", img_date, ".tif"))
-  
-  message("Downloading image for: ", img_date)
-  
-  tok <- CDSE::GetOAuthToken(id = params$clientid, secret = params$secret)
-  
-  r <- CDSE::GetImage(
-    aoi = aoi,
-    time_range = img_date,
-    collection = collection,
-    script = "RGB.js",
-    resolution = 10,
-    format = "image/tiff",
-    token = tok
-  )
-  
-  terra::writeRaster(r, raster_file, overwrite = TRUE)
-  message("Saved (overwritten): ", raster_file)
-  
-  return(raster_file)
-})
-# After the loop
-message("Done! Downloaded ", length(raster_list), " image(s).")
-
 # Run OPTRAM---------------------------------------------------------
 Prepare_OPTRAM_Model <- function() {
   t0 <- Sys.time()
@@ -211,4 +183,3 @@ for (mndwi in mndwi_files) {
     Plot_combined(mndwi, match_file[1])
   }
 }
-
