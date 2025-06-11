@@ -243,6 +243,7 @@ Prepare_OPTRAM_Model <- function() {
     ## scm_mask and run optram
     optram_options("scm_mask", TRUE, show_opts = FALSE) ## just to make sure
     optram_options("max_cloud", cloud_cover, show_opts = FALSE) ## just to make sure
+    optram_options("rm.hi.str", FALSE, show_opts = FALSE) ## removing high STR values
     optram(aoi, from, to, tmp, data_dir) ## run optram wrapper function
     
     message(Sys.time(), " - Creating soil moisture rasters...\n")
