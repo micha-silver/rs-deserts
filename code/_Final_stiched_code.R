@@ -257,72 +257,86 @@ Prepare_OPTRAM_Model()
 # Requires: stars, ggplot2, ggspatial, viridis
 # Written By: Nir, Shay, May
 
-# Plot RGB + MNDWI + soil moisture vertically --------------------------
 Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
+  # Load rasters
   rgb_rast <- read_stars(rgb_file)
   mndwi_rast <- read_stars(mndwi_file)
   sm_rast <- read_stars(sm_file)
   
-  # Extract date from filename safely
-  date_string <- stringr::str_extract(basename(mndwi_file), "\\d{4}-\\d{2}-\\d{2}")
+  # Extract date and tile
+  date_string <- stringr::str_extract(basename(sm_file), "\\d{4}-\\d{2}-\\d{2}")
+  tile_id <- stringr::str_extract(basename(sm_file), "T[0-9A-Z]{5}")
   
+  # Create folder for this date
+  plot_dir <- file.path(Output_dir, "Plots", date_string)
+  if (!dir.exists(plot_dir)) dir.create(plot_dir, recursive = TRUE)
+  
+  # RGB plot
   rgb_plot <- ggplot() +
     geom_stars(data = rgb_rast) +
-    labs(title = paste("RGB -", date_string)) +
+    labs(title = paste("RGB -", date_string, "-", tile_id)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
-    annotation_north_arrow(location = "tr", which_north = "true",
-                           style = north_arrow_fancy_orienteering) +
+    annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
     theme_minimal()
+  ggsave(filename = file.path(plot_dir, paste0("RGB_", tile_id, ".png")),
+         plot = rgb_plot, width = 6, height = 6)
   
+  # MNDWI plot
   mndwi_plot <- ggplot() +
     geom_stars(data = mndwi_rast) +
-    scale_fill_gradient2(
-      name = "MNDWI",
-      low = "saddlebrown", mid = "beige", high = "blue",
-      midpoint = 0, limits = c(-1, 1), oob = scales::squish
-    ) +
-    labs(title = paste("MNDWI -", date_string)) +
+    scale_fill_gradient2(name = "MNDWI", low = "saddlebrown", mid = "beige", high = "blue",
+                         midpoint = 0, limits = c(-1, 1), oob = scales::squish) +
+    labs(title = paste("MNDWI -", date_string, "-", tile_id)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
-    annotation_north_arrow(location = "tr", which_north = "true",
-                           style = north_arrow_fancy_orienteering) +
+    annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
     theme_minimal()
+  ggsave(filename = file.path(plot_dir, paste0("MNDWI_", tile_id, ".png")),
+         plot = mndwi_plot, width = 6, height = 6)
   
+  # Soil Moisture plot
   sm_plot <- ggplot() +
     geom_stars(data = sm_rast) +
-    scale_fill_gradientn(
-      name = "Soil Moisture",
-      colours = c("#00FF00", "#66CC99", "#3399CC", "#0033CC", "#000066"),
-      limits = c(0, 1), oob = scales::squish, breaks = c(0, 1), labels = c("0", "1")
-    ) +
-    labs(title = paste("Soil Moisture -", date_string)) +
+    scale_fill_gradientn(name = "Soil Moisture",
+                         colours = c("#00FF00", "#66CC99", "#3399CC", "#0033CC", "#000066"),
+                         limits = c(0, 1), oob = scales::squish,
+                         breaks = c(0, 1), labels = c("0", "1")) +
+    labs(title = paste("Soil Moisture -", date_string, "-", tile_id)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
-    annotation_north_arrow(location = "tr", which_north = "true",
-                           style = north_arrow_fancy_orienteering) +
+    annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
     theme_minimal()
+  ggsave(filename = file.path(plot_dir, paste0("SoilMoisture_", tile_id, ".png")),
+         plot = sm_plot, width = 6, height = 6)
   
-  combo <- rgb_plot / mndwi_plot / sm_plot
-  
-  print(combo)
-  
-  out_file <- file.path(Output_dir, paste0("summary_plot_", date_string, ".png"))
-  ggsave(out_file, plot = combo, width = 8, height = 18)
-  message("Combined plot saved to: ", out_file)
+  message("Saved RGB, MNDWI, and Soil Moisture plots to: ", plot_dir)
 }
-
 # Match files and generate combined plots ----------------------------
 rgb_files <- list.files(Output_dir, pattern = "^RGB_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
 mndwi_files <- list.files(Output_dir, pattern = "^time_range_\\d{4}-\\d{2}-\\d{2}\\.tiff$", full.names = TRUE)
-soil_files <- list.files(file.path(Output_dir, "OPTRAM"), pattern = "^soil_moisture_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
+soil_files <- list.files(file.path(Output_dir, "OPTRAM"), pattern = "^soil_moisture_\\d{4}-\\d{2}-\\d{2}_T.*\\.tif$", full.names = TRUE)
 
-# Loop through and match by date
-for (mndwi in mndwi_files) {
-  date_part <- stringr::str_extract(basename(mndwi), "\\d{4}-\\d{2}-\\d{2}")
+# Extract all available dates from filenames
+all_dates <- unique(stringr::str_extract(
+  c(basename(rgb_files), basename(mndwi_files), basename(soil_files)),
+  "\\d{4}-\\d{2}-\\d{2}"
+))
+all_dates <- all_dates[!is.na(all_dates)]  # remove NAs if any
+
+# Loop over each date and plot only if all 3 file types exist
+for (date_part in all_dates) {
   rgb_match <- grep(paste0("RGB_", date_part), rgb_files, value = TRUE)
-  sm_match <- grep(paste0("soil_moisture_", date_part), soil_files, value = TRUE)
+  mndwi_match <- grep(paste0("time_range_", date_part), mndwi_files, value = TRUE)
+  sm_matches <- grep(paste0("soil_moisture_", date_part), soil_files, value = TRUE)
   
-  if (length(rgb_match) > 0 && length(sm_match) > 0) {
-    Plot_combined(rgb_match[1], mndwi, sm_match[1])
+  if (length(rgb_match) > 0 && length(mndwi_match) > 0 && length(sm_matches) > 0) {
+    for (sm_file in sm_matches) {
+      Plot_combined(rgb_match[1], mndwi_match[1], sm_file)
+    }
   } else {
-    message("Skipping date ", date_part, " — missing RGB or soil moisture file.")
+    missing <- c()
+    if (length(rgb_match) == 0) missing <- c(missing, "RGB")
+    if (length(mndwi_match) == 0) missing <- c(missing, "MNDWI")
+    if (length(sm_matches) == 0) missing <- c(missing, "Soil Moisture")
+    message("Skipping date ", date_part, " — missing: ", paste(missing, collapse = ", "))
   }
 }
+
