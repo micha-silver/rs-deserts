@@ -6,20 +6,20 @@ function setup() {
     }],
     output: {
       bands: 4,
-      sampleType: "UINT8" // Force 0–255 range
+      sampleType: "UINT8"
     }
   };
 }
 
-function evaluatePixel(sample) {
-  function stretch(val) {
-    return Math.min(255, Math.max(0, Math.round(val * 255)));
-  }
+function stretch(val, min, max) {
+  return Math.min(255, Math.max(0, Math.round(255 * (val - min) / (max - min))));
+}
 
+function evaluatePixel(sample) {
   return [
-    stretch(sample.B04),  // Red
-    stretch(sample.B03),  // Green
-    stretch(sample.B02),  // Blue
-    sample.dataMask * 255 // Alpha (0 or 255)
+    stretch(sample.B04, 0.01, 0.15), // Red
+    stretch(sample.B03, 0.01, 0.15), // Green
+    stretch(sample.B02, 0.01, 0.15), // Blue
+    sample.dataMask * 255            // Alpha
   ];
 }

@@ -259,7 +259,6 @@ Prepare_OPTRAM_Model()
 
 Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
   # Load rasters
-  rgb_rast <- read_stars(rgb_file)
   mndwi_rast <- read_stars(mndwi_file)
   sm_rast <- read_stars(sm_file)
   
@@ -271,15 +270,13 @@ Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
   plot_dir <- file.path(Output_dir, "Plots", date_string)
   if (!dir.exists(plot_dir)) dir.create(plot_dir, recursive = TRUE)
   
-  # RGB plot
-  rgb_plot <- ggplot() +
-    geom_stars(data = rgb_rast) +
-    labs(title = paste("RGB -", date_string, "-", tile_id)) +
-    annotation_scale(location = "bl", width_hint = 0.5) +
-    annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
-    theme_minimal()
-  ggsave(filename = file.path(plot_dir, paste0("RGB_", tile_id, ".png")),
-         plot = rgb_plot, width = 6, height = 6)
+  # --- RGB PLOT with terra::plotRGB ---
+  r <- terra::rast(rgb_file)
+  rgb_path <- file.path(plot_dir, paste0("RGB_", tile_id, ".png"))
+  if (file.exists(rgb_path)) file.remove(rgb_path)
+  png(rgb_path, width = 800, height = 800)
+  plotRGB(r, r = 1, g = 2, b = 3, scale = 255, stretch = "lin", main = paste("RGB -", date_string, tile_id))
+  dev.off()
   
   # MNDWI plot
   mndwi_plot <- ggplot() +
@@ -289,9 +286,9 @@ Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
     labs(title = paste("MNDWI -", date_string, "-", tile_id)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
-    theme_minimal()
-  ggsave(filename = file.path(plot_dir, paste0("MNDWI_", tile_id, ".png")),
-         plot = mndwi_plot, width = 6, height = 6)
+    theme_minimal() +
+    theme(panel.grid = element_blank())
+  ggsave(filename = file.path(plot_dir, paste0("MNDWI_", tile_id, ".png")), plot = mndwi_plot, width = 6, height = 6)
   
   # Soil Moisture plot
   sm_plot <- ggplot() +
@@ -303,12 +300,13 @@ Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
     labs(title = paste("Soil Moisture -", date_string, "-", tile_id)) +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
-    theme_minimal()
-  ggsave(filename = file.path(plot_dir, paste0("SoilMoisture_", tile_id, ".png")),
-         plot = sm_plot, width = 6, height = 6)
+    theme_minimal() +
+    theme(panel.grid = element_blank())
+  ggsave(filename = file.path(plot_dir, paste0("SoilMoisture_", tile_id, ".png")), plot = sm_plot, width = 6, height = 6)
   
-  message("Saved RGB, MNDWI, and Soil Moisture plots to: ", plot_dir)
+  message("Saved all plots to: ", plot_dir)
 }
+
 # Match files and generate combined plots ----------------------------
 rgb_files <- list.files(Output_dir, pattern = "^RGB_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
 mndwi_files <- list.files(Output_dir, pattern = "^time_range_\\d{4}-\\d{2}-\\d{2}\\.tiff$", full.names = TRUE)
