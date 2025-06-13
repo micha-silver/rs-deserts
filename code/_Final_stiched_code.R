@@ -123,24 +123,20 @@ raster_list <- lapply(1:nrow(image_list), function(x) {
   img_date <- as.character(image_list$acquisitionDate[x])
   raster_file <- file.path(Output_dir, paste0("RGB_", img_date, ".tif"))
   
-  if (!file.exists(raster_file)) {
-    message("Downloading image for: ", img_date)
-    
-    r <- CDSE::GetImage(
-      aoi = aoi,
-      time_range = img_date,
-      collection = collection,
-      script = "code/RGB.js",
-      resolution = 10,
-      format = "image/tiff",
-      token = tok
-    )
-    
-    terra::writeRaster(r, raster_file, overwrite = TRUE)
-    message("Saved: ", raster_file)
-  } else {
-    message("Already exists, skipping: ", raster_file)
-  }
+  message("Downloading image for: ", img_date)
+  
+  r <- CDSE::GetImage(
+    aoi = aoi,
+    time_range = img_date,
+    collection = collection,
+    script = "code/RGB.js",
+    resolution = 10,
+    format = "image/tiff",
+    token = tok
+  )
+  
+  terra::writeRaster(r, raster_file, overwrite = TRUE)
+  message("Saved: ", raster_file)
   
   return(raster_file)
 })
@@ -345,4 +341,3 @@ for (date_part in all_dates) {
     message("Skipping date ", date_part, " — missing: ", paste(missing, collapse = ", "))
   }
 }
-
