@@ -256,11 +256,18 @@ Prepare_OPTRAM_Model()
 # Returns: A ggplot map (also displayed)
 # Requires: stars, ggplot2, ggspatial, viridis
 # Written By: Nir, Shay, May
-
 Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
   # Load rasters
   mndwi_rast <- read_stars(mndwi_file)
   sm_rast <- read_stars(sm_file)
+  
+  # תקן CRS חסר עבור ggplot (למניעת שגיאה של st_transform)
+  if (is.na(sf::st_crs(mndwi_rast))) {
+    mndwi_rast <- sf::st_set_crs(mndwi_rast, 4326)
+  }
+  if (is.na(sf::st_crs(sm_rast))) {
+    sm_rast <- sf::st_set_crs(sm_rast, 4326)
+  }
   
   # Extract date and tile
   date_string <- stringr::str_extract(basename(sm_file), "\\d{4}-\\d{2}-\\d{2}")
@@ -270,7 +277,7 @@ Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
   plot_dir <- file.path(Output_dir, "Plots", date_string)
   if (!dir.exists(plot_dir)) dir.create(plot_dir, recursive = TRUE)
   
-  # --- RGB PLOT with terra::plotRGB ---
+  # RGB plot using plotRGB (terra)
   r <- terra::rast(rgb_file)
   rgb_path <- file.path(plot_dir, paste0("RGB_", tile_id, ".png"))
   if (file.exists(rgb_path)) file.remove(rgb_path)
@@ -304,8 +311,9 @@ Plot_combined <- function(rgb_file, mndwi_file, sm_file) {
     theme(panel.grid = element_blank())
   ggsave(filename = file.path(plot_dir, paste0("SoilMoisture_", tile_id, ".png")), plot = sm_plot, width = 6, height = 6)
   
-  message("Saved all plots to: ", plot_dir)
+  message("✅ Saved all plots to: ", plot_dir)
 }
+
 
 # Match files and generate combined plots ----------------------------
 rgb_files <- list.files(Output_dir, pattern = "^RGB_\\d{4}-\\d{2}-\\d{2}\\.tif$", full.names = TRUE)
