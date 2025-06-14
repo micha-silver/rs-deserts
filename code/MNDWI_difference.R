@@ -5,8 +5,8 @@ library(stars)
 library(viridis)
 
 # Paths to the input MNDWI rasters (change as needed)
-r1_path <- "Output/pre-flood date of your choice.tiff"
-r2_path <- "Output/post-flood date of your choice.tiff"
+r1_path <- "C:\\Users\\gura1\\rs-deserts\\Output\\time_range_2021-06-01.tiff"
+r2_path <- "C:\\Users\\gura1\\rs-deserts\\Output\\time_range_2021-10-09.tiff"
 
 # Load rasters
 r1 <- rast(r1_path)

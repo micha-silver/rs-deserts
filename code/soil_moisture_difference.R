@@ -5,8 +5,8 @@ library(viridis)
 library(ggspatial)
 
 # Define file paths
-r1_path <- "Output/pre-flood date of your choice.tif"
-r2_path <- "Output/post-flood date of your choice.tif"
+r1_path <- "C:\\Users\\gura1\\rs-deserts\\Output\\time_range_2021-06-01.tiff"
+r2_path <- "C:\\Users\\gura1\\rs-deserts\\Output\\time_range_2021-10-09.tiff"
 
 # Read rasters
 r1 <- rast(r1_path)
@@ -35,7 +35,7 @@ print(
     geom_stars(data = diff_stars) +
     scale_fill_gradient2(name = "Δ Soil Moisture", low = "red", mid = "white", high = "blue",
                          midpoint = 0, limits = c(-1, 1), oob = scales::squish) +
-    labs(title = "Difference in Soil Moisture (23 Feb - 03 Feb 2025)") +
+    labs(title = "Difference in Soil Moisture (October 10th - June 1st 2021)") +
     annotation_scale(location = "bl", width_hint = 0.5) +
     annotation_north_arrow(location = "tr", which_north = "true", style = north_arrow_fancy_orienteering) +
     theme_minimal() +
