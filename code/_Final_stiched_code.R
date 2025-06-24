@@ -152,13 +152,6 @@ message("Done! Downloaded ", length(raster_list), " image(s).")
 # Requires: rOPTRAM, CDSE, yaml, sf
 # Written By: Hagar Boneh, Noa Cohen and Gill Tsemach
 
-## loading packages
-library(sf)
-library(sfc)
-library(CDSE)
-library(yaml)
-library(rOPTRAM)
-
 
 Prepare_OPTRAM_Model <- function() {
   
@@ -186,17 +179,6 @@ Prepare_OPTRAM_Model <- function() {
   }, error = function(e) {
     message(e,"\n")
   }, finally = {
-    
-    ## insert MNDWI mask?
-    # aoi_masked <- <mask out water surfaces>
-    # aoi_masked <- aoi[mask_MNDWI]
-    
-    ## or just remove high values?
-    # optram_options("rm.hi.str", TRUE, FALSE) ## STR, affects only the model
-    # # optram_options("rm.low.vi", TRUE, FALSE) ## VI, affects only the model
-    
-    ## for masking each raster, less suitable?
-    # mask(<ras>, <mask>, maskvalues=TRUE) ## terra library
     
     ## create dir for the soil moisture product
     if (!dir.exists(file.path(Output_dir, "OPTRAM"))) {
@@ -341,3 +323,23 @@ for (date_part in all_dates) {
     message("Skipping date ", date_part, " — missing: ", paste(missing, collapse = ", "))
   }
 }
+
+# OPTRAM trapezoid plot
+optram_trapez <- function() {
+data_dir <- file.path(Output_dir, "OPTRAM/data")
+full_df <- readRDS(file.path(data_dir, "VI_STR_data.rds")) # read data
+edges_df <- read.csv(file.path(data_dir, "trapezoid_edges_lin.csv")) # read data
+optram_options("plot_colors", "density", show_opts = FALSE) # graphical represent as density
+aoi_name <- tools::file_path_sans_ext(basename(aoi_path)) ## extract AOI file name
+
+pl <- plot_vi_str_cloud(full_df = full_df, edges_df = edges_df) + 
+  ggplot2::ggtitle(paste("OPTRAM Model for:", aoi_name)) + 
+  ggplot2::theme(legend.position = "right")
+ggsave(filename = file.path(Output_dir, "Plots",paste0("Trapezoid_", aoi_name, ".png")), width = 8, height = 6)
+
+message(paste("OPTRAM Model saved to:", file.path(Output_dir, "Plots")))
+}
+
+optram_trapez()
+
+message("All 4 sections of the code fininshed running")
